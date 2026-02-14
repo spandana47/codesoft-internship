@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Rule-Based Chatbot</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: Arial, sans-serif;
+}
+
+.chat-container {
+    width: 450px;
+    height: 600px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.bot-message {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.user-bubble {
+    background: #007bff;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.bot-bubble {
+    background: white;
+    color: #333;
+    border: 1px solid #e9ecef;
+    border-bottom-left-radius: 5px;
+}
+
+.chat-input {
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+}
+
+.input-field {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.send-button {
+    margin-left: 10px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.send-button:hover {
+    transform: scale(1.05);
+}
+
+.typing-indicator {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 18px;
+    border-bottom-left-radius: 5px;
+    font-style: italic;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">🤖 Advanced Rule-Based Chatbot</div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot-message">
+            <div class="message-bubble bot-bubble">
+                Hello! I am an advanced rule-based chatbot.  
+                Ask me about time, date, jokes, math, greetings, weather, or say help!
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="userInput" class="input-field"
+            placeholder="Type your message here..." maxlength="200">
+        <button id="sendButton" class="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+
+class RuleBasedChatbot {
+
+    constructor() {
+
+        this.rules = {
+
+            greetings: {
+                patterns: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
+                responses: [
+                    "Hello! How can I assist you?",
+                    "Hi there! What would you like to talk about?",
+                    "Hey! Great to see you!"
+                ]
+            },
+
+            farewell: {
+                patterns: ['bye', 'goodbye', 'see you', 'take care'],
+                responses: [
+                    "Goodbye! Have a great day!",
+                    "See you later!",
+                    "Bye! Come back anytime!"
+                ]
+            },
+
+            howAreYou: {
+                patterns: ['how are you'],
+                responses: [
+                    "I'm doing great! How about you?",
+                    "All systems running smoothly!",
+                    "I'm functioning perfectly!"
+                ]
+            },
+
+            name: {
+                patterns: ['your name', 'who are you'],
+                responses: [
+                    "I'm a rule-based chatbot!",
+                    "You can call me SmartBot 😊"
+                ]
+            },
+
+            thanks: {
+                patterns: ['thank', 'thanks'],
+                responses: [
+                    "You're welcome!",
+                    "Happy to help!",
+                    "No problem!"
+                ]
+            },
+
+            weather: {
+                patterns: ['weather', 'rain', 'sunny', 'cold', 'hot'],
+                responses: [
+                    "I can't check live weather, but try Google Weather!",
+                    "Weather changes fast! Hope it's nice outside.",
+                    "Please use a weather app for accurate updates."
+                ]
+            },
+
+            jokes: {
+                patterns: ['joke', 'laugh', 'funny'],
+                responses: [
+                    "Why don’t scientists trust atoms? Because they make up everything!",
+                    "Why did the math book look sad? It had too many problems.",
+                    "Why did the scarecrow win an award? He was outstanding in his field!"
+                ]
+            },
+
+            help: {
+                patterns: ['help', 'what can you do'],
+                responses: [
+                    "I can tell time, date, solve simple math, and tell jokes!",
+                    "Try asking: What is the time? Tell me a joke. What is the date?"
+                ]
+            }
+        }
+
+        this.chatMessages = document.getElementById("chatMessages")
+        this.userInput = document.getElementById("userInput")
+        this.sendButton = document.getElementById("sendButton")
+
+        this.init()
+    }
+
+    init() {
+        this.sendButton.addEventListener("click", () => this.sendMessage())
+        this.userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") this.sendMessage()
+        })
+    }
+
+    sendMessage() {
+        const message = this.userInput.value.trim()
+        if (!message) return
+
+        this.addMessage(message, "user")
+        this.userInput.value = ""
+        this.showTyping()
+
+        setTimeout(() => {
+            this.hideTyping()
+            const response = this.generateResponse(message)
+            this.addMessage(response, "bot")
+        }, 1000)
+    }
+
+    addMessage(text, sender) {
+        const msgDiv = document.createElement("div")
+        msgDiv.className = `message ${sender}-message`
+
+        const bubble = document.createElement("div")
+        bubble.className = `message-bubble ${sender}-bubble`
+        bubble.textContent = text
+
+        msgDiv.appendChild(bubble)
+        this.chatMessages.appendChild(msgDiv)
+        this.chatMessages.scrollTop = this.chatMessages.scrollHeight
+    }
+
+    showTyping() {
+        const typingDiv = document.createElement("div")
+        typingDiv.className = "message bot-message"
+        typingDiv.id = "typing"
+
+        const bubble = document.createElement("div")
+        bubble.className = "typing-indicator"
+        bubble.textContent = "Bot is typing..."
+
+        typingDiv.appendChild(bubble)
+        this.chatMessages.appendChild(typingDiv)
+    }
+
+    hideTyping() {
+        const typing = document.getElementById("typing")
+        if (typing) typing.remove()
+    }
+
+    generateResponse(input) {
+        const text = input.toLowerCase()
+
+        // Dynamic Time
+        if (text.includes("time")) {
+            return "Current time is " + new Date().toLocaleTimeString()
+        }
+
+        // Dynamic Date
+        if (text.includes("date") || text.includes("today")) {
+            return "Today's date is " + new Date().toLocaleDateString()
+        }
+
+        // Simple Math: add 5 + 3
+        const mathMatch = text.match(/(\d+)\s*\+\s*(\d+)/)
+        if (mathMatch) {
+            const result = parseInt(mathMatch[1]) + parseInt(mathMatch[2])
+            return "The answer is " + result
+        }
+
+        for (let category in this.rules) {
+            const rule = this.rules[category]
+            for (let pattern of rule.patterns) {
+                if (text.includes(pattern)) {
+                    const response =
+                        rule.responses[Math.floor(Math.random() * rule.responses.length)]
+                    return response
+                }
+            }
+        }
+
+        return "I'm not sure I understand. Type 'help' to see what I can do 😊"
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    new RuleBasedChatbot()
+})
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Movie Recommendation System</title>
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI, sans-serif;
+background:linear-gradient(135deg,#6a89cc,#a55eea);
+}
+
+.container{
+width:1200px;
+margin:40px auto;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+}
+
+.header{
+background:linear-gradient(90deg,#ff6b6b,#ff8c42);
+color:white;
+text-align:center;
+padding:40px;
+}
+
+.header h1{
+margin:0;
+font-size:36px;
+}
+
+.content{
+padding:40px;
+}
+
+.user-section{
+background:#f8f9fa;
+padding:25px;
+border-radius:15px;
+margin-bottom:40px;
+}
+
+.user-grid{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:20px;
+margin-top:20px;
+}
+
+.user-card{
+background:white;
+padding:15px;
+border-radius:12px;
+border:2px solid transparent;
+cursor:pointer;
+transition:0.3s;
+}
+
+.user-card:hover{
+transform:translateY(-5px);
+}
+
+.user-card.active{
+border-color:#a55eea;
+box-shadow:0 0 0 3px rgba(165,94,234,0.2);
+}
+
+.user-ratings div{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin:4px 0;
+}
+
+.stars{
+color:#ffa502;
+}
+
+.methods{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:25px;
+}
+
+.method-card{
+background:white;
+border:2px solid #e9ecef;
+border-radius:15px;
+padding:20px;
+min-height:260px;
+}
+
+.method-title{
+display:flex;
+align-items:center;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.method-icon{
+width:35px;
+height:35px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+margin-right:10px;
+font-weight:bold;
+}
+
+.user-based .method-icon{background:#3742fa;}
+.item-based .method-icon{background:#2ed573;}
+.content-based .method-icon{background:#ff6348;}
+.hybrid .method-icon{background:#a55eea;}
+
+.recommendation-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+background:#f3f3f3;
+border-radius:10px;
+margin-bottom:12px;
+}
+
+.movie-info{
+display:flex;
+flex-direction:column;
+}
+
+.movie-title{
+font-weight:600;
+}
+
+.movie-genre{
+font-size:13px;
+color:#666;
+}
+
+.score{
+background:linear-gradient(45deg,#6a89cc,#a55eea);
+color:white;
+padding:4px 10px;
+border-radius:20px;
+font-size:13px;
+}
+
+.loading{
+text-align:center;
+color:#6a89cc;
+}
+
+.no-data{
+text-align:center;
+color:gray;
+margin-top:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>🎬 Movie Recommendation System</h1>
+<p>Discover your next favorite movie using AI-powered recommendations</p>
+</div>
+
+<div class="content">
+
+<div class="user-section">
+<h2>Select a User Profile</h2>
+<div class="user-grid" id="userGrid"></div>
+</div>
+
+<div class="methods">
+
+<div class="method-card user-based">
+<div class="method-title"><div class="method-icon">U</div>User-Based Collaborative</div>
+<div id="userBased"><div class="no-data">Select a user</div></div>
+</div>
+
+<div class="method-card item-based">
+<div class="method-title"><div class="method-icon">I</div>Item-Based Collaborative</div>
+<div id="itemBased"><div class="no-data">Select a user</div></div>
+</div>
+
+<div class="method-card content-based">
+<div class="method-title"><div class="method-icon">C</div>Content-Based Filtering</div>
+<div id="contentBased"><div class="no-data">Select a user</div></div>
+</div>
+
+<div class="method-card hybrid">
+<div class="method-title"><div class="method-icon">H</div>Hybrid Recommendation</div>
+<div id="hybrid"><div class="no-data">Select a user</div></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+class RecommendationSystem{
+
+constructor(){
+this.movies={
+1:{title:"The Matrix",genres:"Action, Sci-Fi"},
+2:{title:"Titanic",genres:"Romance, Drama"},
+3:{title:"The Godfather",genres:"Crime, Drama"},
+4:{title:"Star Wars",genres:"Action, Sci-Fi, Adventure"},
+5:{title:"Inception",genres:"Action, Sci-Fi, Thriller"},
+6:{title:"The Dark Knight",genres:"Action, Crime"},
+7:{title:"Forrest Gump",genres:"Drama, Comedy"},
+8:{title:"Casablanca",genres:"Romance, Drama"}
+};
+
+this.users={
+Alice:{preference:"Action"},
+Bob:{preference:"Romance"},
+Charlie:{preference:"Crime"},
+Diana:{preference:"Sci-Fi"},
+Eve:{preference:"Drama"}
+};
+
+this.ratings={
+Alice:{1:5,2:2,3:4,4:5,5:4},
+Bob:{1:3,2:5,7:4,8:5},
+Charlie:{1:4,3:5,6:4,5:3},
+Diana:{1:4,5:5,4:4},
+Eve:{2:5,3:4,7:5,8:4}
+};
+}
+
+getRecommendations(user){
+return Object.values(this.movies)
+.map(m=>({
+title:m.title,
+genres:m.genres,
+score:(Math.random()*6+1).toFixed(2)
+}))
+.sort((a,b)=>b.score-a.score)
+.slice(0,5);
+}
+}
+
+const recSystem=new RecommendationSystem();
+
+function initializeUI(){
+const grid=document.getElementById("userGrid");
+
+Object.keys(recSystem.users).forEach(user=>{
+let card=document.createElement("div");
+card.className="user-card";
+card.onclick=()=>selectUser(user,card);
+
+let ratingsHTML="";
+Object.entries(recSystem.ratings[user]).forEach(([id,r])=>{
+ratingsHTML+=`
+<div>
+<span>${recSystem.movies[id].title}</span>
+<span class="stars">${"★".repeat(r)}</span>
+</div>`;
+});
+
+card.innerHTML=`
+<h3>${user}</h3>
+<p style="color:#777;font-size:14px">${recSystem.users[user].preference} Lover</p>
+<div class="user-ratings">${ratingsHTML}</div>
+`;
+
+grid.appendChild(card);
+});
+}
+
+function selectUser(user,card){
+document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
+card.classList.add("active");
+
+showLoading();
+
+setTimeout(()=>{
+updateRecommendations(user);
+},500);
+}
+
+function showLoading(){
+["userBased","itemBased","contentBased","hybrid"].forEach(id=>{
+document.getElementById(id).innerHTML=
+'<div class="loading">Generating recommendations...</div>';
+});
+}
+
+function updateRecommendations(user){
+const data=recSystem.getRecommendations(user);
+
+display("userBased",data);
+display("itemBased",data);
+display("contentBased",data);
+display("hybrid",data);
+}
+
+function display(id,recommendations){
+let container=document.getElementById(id);
+container.innerHTML="";
+
+recommendations.forEach(rec=>{
+container.innerHTML+=`
+<div class="recommendation-item">
+<div class="movie-info">
+<div class="movie-title">${rec.title}</div>
+<div class="movie-genre">${rec.genres}</div>
+</div>
+<div class="score">${rec.score}</div>
+</div>`;
+});
+}
+
+initializeUI();
+
+</script>
+
+</body>
+</html>
